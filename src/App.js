@@ -165,10 +165,45 @@ function App() {
           <div className="result-container">
             <h3>Analysis Result:</h3>
             <div className="result-content">
-              {typeof result === 'object' ? (
-                <pre>{JSON.stringify(result, null, 2)}</pre>
+              {result.success && result.prediction ? (
+                <div className="prediction-result">
+                  <div className="prediction-header">
+                    <h4>Prediction: <span className={`prediction-class ${result.prediction.predicted_class.toLowerCase().replace('-', '')}`}>{result.prediction.predicted_class}</span></h4>
+                  </div>
+                  
+                  <div className="prediction-details">
+                    <div className="detail-item">
+                      <label>Confidence Level:</label>
+                      <div className="confidence-bar-container">
+                        <div 
+                          className="confidence-bar" 
+                          style={{ width: `${(result.prediction.confidence * 100).toFixed(2)}%` }}
+                        >
+                          <span className="confidence-text">{(result.prediction.confidence * 100).toFixed(2)}%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="detail-item">
+                      <label>Class Probabilities:</label>
+                      <div className="probabilities">
+                        {Object.entries(result.prediction.class_probabilities).map(([className, probability]) => (
+                          <div key={className} className="probability-item">
+                            <span className="probability-label">{className}:</span>
+                            <span className="probability-value">{(probability * 100).toFixed(2)}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="detail-item">
+                      <label>Filename:</label>
+                      <p className="filename">{result.filename}</p>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <p>{result}</p>
+                <pre>{JSON.stringify(result, null, 2)}</pre>
               )}
             </div>
           </div>
