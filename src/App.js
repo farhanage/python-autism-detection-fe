@@ -8,11 +8,36 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-    setSelectedFile(file);
     setResult(null);
     setError(null);
+
+    if (!file) {
+      setSelectedFile(null);
+      setPreview(null);
+      return;
+    }
+
+    // File size validation
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`File too large. Maximum size is 5MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+      setSelectedFile(null);
+      setPreview(null);
+      return;
+    }
+
+    // File type validation
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file.');
+      setSelectedFile(null);
+      setPreview(null);
+      return;
+    }
+
+    setSelectedFile(file);
 
     if (file) {
       const reader = new FileReader();
@@ -42,7 +67,7 @@ function App() {
 
     try {
       // FastAPI backend endpoint - using the correct endpoint path
-      const response = await fetch('http://localhost:8000/predict', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/predict`, {
         method: 'POST',
         body: formData,
       });
