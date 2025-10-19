@@ -8,7 +8,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILE_SIZE = 524288000; // 5MB
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -67,19 +67,33 @@ function App() {
 
     try {
       // FastAPI backend endpoint - using the correct endpoint path
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/predict`, {
+      const apiUrl = `${process.env.REACT_APP_API_URL}/predict`;
+      console.log('Calling API:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
+        const responseText = await response.text();
+        console.error('API Response:', responseText);
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Unexpected content type:', contentType);
+        console.error('Response body:', responseText);
+        throw new Error('API returned non-JSON response. Check console for details.');
       }
 
       const data = await response.json();
       setResult(data);
     } catch (err) {
       setError(`Error: ${err.message}`);
+      console.error('Full error:', err);
     } finally {
       setLoading(false);
     }
