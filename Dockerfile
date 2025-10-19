@@ -1,6 +1,11 @@
 # Build stage
 FROM node:20-alpine AS build
 WORKDIR /app
+
+# Accept API URL as build argument
+ARG REACT_APP_API_URL=https://autism-api.farhanage.site
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 COPY package*.json ./
 RUN npm install
 COPY . .
