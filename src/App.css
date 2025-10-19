@@ -241,6 +241,12 @@
   border-radius: 6px;
 }
 
+@media (max-width: 480px) {
+  .probabilities {
+    grid-template-columns: 1fr;
+  }
+}
+
 .probability-item {
   display: flex;
   justify-content: space-between;
